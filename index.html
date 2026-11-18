@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Hub — Комплексний профорієнтаційний тест</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #818cf8;
+            --bg-color: #09090b;
+            --card-bg: #121215;
+            --surface-bg: #18181b;
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --border: #27272a;
+            --selected-bg: rgba(99, 102, 241, 0.15);
+            --success: #10b981;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 30px 15px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header-card {
+            background: var(--card-bg);
+            padding: 28px 32px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            border-top: 4px solid var(--primary);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-bottom: 24px;
+        }
+
+        .header-card h1 {
+            margin: 0 0 8px 0;
+            font-size: 24px;
+            color: var(--text-main);
+        }
+
+        .header-card p {
+            margin: 0 0 18px 0;
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        /* Прогрес-бар частин */
+        .progress-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: 600;
+            color: #a5b4fc;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 6px;
+            background-color: var(--surface-bg);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary);
+            width: 20%;
+            transition: width 0.3s ease;
+        }
+
+        .part-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .part-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .part-banner {
+            font-size: 18px;
+            font-weight: 700;
+            color: #c7d2fe;
+            margin-bottom: 18px;
+            padding-left: 12px;
+            border-left: 3px solid var(--primary);
+        }
+
+        .question-card {
+            background: var(--card-bg);
+            padding: 24px 28px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            margin-bottom: 18px;
+            transition: border-color 0.2s;
+        }
+
+        .question-card.unanswered {
+            border-color: #ef4444;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.15);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .question-title {
+            font-size: 17px;
+            font-weight: 600;
+            margin: 0;
+            color: var(--text-main);
+        }
+
+        .type-hint {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: var(--surface-bg);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        .options-group {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background-color: var(--surface-bg);
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-size: 15px;
+            color: var(--text-main);
+        }
+
+        .option-label:hover {
+            border-color: var(--primary);
+            background-color: #1f1f24;
+        }
+
+        .option-label input[type="radio"],
+        .option-label input[type="checkbox"] {
+            margin-right: 12px;
+            accent-color: var(--primary);
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option-label:has(input:checked) {
+            border-color: var(--primary);
+            background-color: var(--selected-bg);
+            font-weight: 500;
+            color: #c7d2fe;
+        }
+
+        /* Шкала 1-5 */
+        .scale-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .scale-buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        .scale-item {
+            position: relative;
+        }
+
+        .scale-item input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .scale-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 48px;
+            background: var(--surface-bg);
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .scale-item:hover .scale-box {
+            border-color: var(--primary);
+        }
+
+        .scale-item input:checked + .scale-box {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .scale-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Навігація */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 28px;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: var(--surface-bg);
+            color: var(--text-muted);
+            border: 1.5px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            color: var(--text-main);
+            border-color: var(--text-main);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 4px 18px rgba(99, 102, 241, 0.35);
+            margin-left: auto;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .error-msg {
+            color: #f87171;
+            font-weight: 500;
+            margin-top: 14px;
+            text-align: center;
+            display: none;
+        }
+
+        /* Результат */
+        #result-block {
+            display: none;
+            background: var(--card-bg);
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+            border: 1.5px solid var(--primary);
+            animation: fadeIn 0.4s ease;
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--selected-bg);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 14px;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            margin: 22px 0;
+        }
+
+        @media (max-width: 640px) {
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .result-box-item {
+            background: var(--surface-bg);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .result-box-item.full-width {
+            grid-column: 1 / -1;
+            border-color: rgba(16, 185, 129, 0.35);
+            background: rgba(16, 185, 129, 0.06);
+        }
+
+        .result-box-item span {
+            display: block;
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .result-box-item strong {
+            font-size: 18px;
+            color: #ffffff;
+            line-height: 1.4;
+            display: block;
+        }
+
+        .result-description {
+            color: var(--text-muted);
+            font-size: 16px;
+            margin-bottom: 24px;
+        }
+
+        .skills-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .skill-tag {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: #e4e4e7;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-card" id="header-card">
+        <h1>Student Hub: Профорієнтація та оцінка навичок</h1>
+        <p>Пройди 5 коротких блоків, щоб отримати точну рекомендацію спеціальності, першої професії та план старту кар'єри.</p>
+        
+        <div class="progress-wrapper">
+            <div class="progress-info">
+                <span id="part-indicator">Частина 1 з 5</span>
+                <span id="percent-indicator">20%</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <form id="quiz-form">
+        <div id="parts-container"></div>
+        <div id="error-msg" class="error-msg">Будь ласка, дай відповідь на всі виділені запитання в цій частині!</div>
+    </form>
+
+    <!-- Екран миттєвого результату -->
+    <div id="result-block">
+        <div class="badge">Аналіз завершено</div>
+        <h2 style="margin: 0 0 8px 0; font-size: 24px; color: #ffffff;">Твій кар'єрний профіль на Student Hub</h2>
+        <p class="result-description" id="res-desc"></p>
+
+        <div class="result-grid">
+            <div class="result-box-item">
+                <span>🎓 Рекомендована спеціальність</span>
+                <strong id="res-specialty">—</strong>
+            </div>
+            <div class="result-box-item">
+                <span>💼 Перша професія (старт роботи)</span>
+                <strong id="res-profession">—</strong>
+            </div>
+            <div class="result-box-item full-width">
+                <span>🚀 Статус готовності до працевлаштування</span>
+                <strong id="res-readiness" style="color: #34d399; font-size: 16px;">—</strong>
+                <div id="res-skills-wrapper" style="margin-top: 12px; display: none;">
+                    <span style="margin-bottom: 4px;">Рекомендовані навички для прокачки:</span>
+                    <div class="skills-tags" id="res-skills-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-secondary" onclick="resetQuiz()">Пройти тест заново</button>
+    </div>
+</div>
+
+<script>
+    // Категорії: it, med, econ, law, eng, art, edu, biz, psych, media
+    const quizParts = [
+        {
+            partTitle: "Частина 1. Інтереси та особисті якості",
+            questions: [
+                {
+                    id: 1,
+                    q: "1. Яка сфера діяльності тебе найбільше цікавить?",
+                    type: "radio",
+                    options: [
+                        { text: "Медицина та охорона здоров'я", weights: { med: 4 } },
+                        { text: "Інформаційні технології", weights: { it: 4 } },
+                        { text: "Економіка та фінанси", weights: { econ: 4 } },
+                        { text: "Право та юриспруденція", weights: { law: 4 } },
+                        { text: "Інженерія та будівництво", weights: { eng: 4 } },
+                        { text: "Дизайн та мистецтво", weights: { art: 4 } },
+                        { text: "Освіта та педагогіка", weights: { edu: 4 } },
+                        { text: "Бізнес та підприємництво", weights: { biz: 4 } },
+                        { text: "Психологія та соціальна робота", weights: { psych: 4 } },
+                        { text: "Журналістика та комунікації", weights: { media: 4 } },
+                        { text: "Туризм та готельно-ресторанна справа", weights: { biz: 2, media: 2 } },
+                        { text: "Поки що не визначився", weights: {} }
+                    ]
+                },
+                {
+                    id: 2,
+                    q: "2. Які якості ти вважаєш своїми найсильнішими?",
+                    type: "checkbox",
+                    options: [
+                        { text: "Логічне мислення", weights: { it: 2, eng: 2, econ: 1 } },
+                        { text: "Креативність", weights: { art: 2, media: 2, biz: 1 } },
+                        { text: "Комунікабельність", weights: { media: 2, psych: 1, biz: 1, edu: 1 } },
+                        { text: "Відповідальність", weights: { med: 2, law: 2, eng: 1 } },
+                        { text: "Уважність до деталей", weights: { law: 2, econ: 2, med: 1, it: 1 } },
+                        { text: "Організованість", weights: { biz: 2, econ: 1, edu: 1 } },
+                        { text: "Терплячість", weights: { edu: 2, psych: 2, med: 1 } },
+                        { text: "Лідерські якості", weights: { biz: 2, law: 1, media: 1 } }
+                    ]
+                },
+                {
+                    id: 3,
+                    q: "3. Що тобі найбільше подобається робити у вільний час?",
+                    type: "radio",
+                    options: [
+                        { text: "Читати, досліджувати та вивчати нове", weights: { law: 2, med: 2, edu: 1 } },
+                        { text: "Створювати щось власноруч", weights: { eng: 2, art: 2 } },
+                        { text: "Спілкуватися з людьми", weights: { media: 2, psych: 1, biz: 1 } },
+                        { text: "Розв'язувати логічні завдання", weights: { it: 2, econ: 2 } },
+                        { text: "Займатися творчістю", weights: { art: 3, media: 1 } },
+                        { text: "Організовувати різні заходи", weights: { biz: 2, media: 1 } },
+                        { text: "Допомагати іншим", weights: { med: 2, psych: 2, edu: 1 } }
+                    ]
+                },
+                {
+                    id: 4,
+                    q: "4. Який тип завдань тобі найбільше подобається?",
+                    type: "radio",
+                    options: [
+                        { text: "Робота з числами та інформацією", weights: { econ: 2, it: 2 } },
+                        { text: "Робота з людьми та спілкування", weights: { psych: 2, media: 2, edu: 1 } },
+                        { text: "Практична робота з технікою", weights: { eng: 3, it: 1 } },
+                        { text: "Творчі та нестандартні завдання", weights: { art: 3, media: 1 } },
+                        { text: "Дослідження та експерименти", weights: { med: 3, eng: 1 } },
+                        { text: "Організація та управління", weights: { biz: 3, law: 1 } }
+                    ]
+                },
+                {
+                    id: 5,
+                    q: "5. Як ти зазвичай приймаєш важливі рішення?",
+                    type: "radio",
+                    options: [
+                        { text: "Аналізую факти та інформацію", weights: { it: 2, law: 2, econ: 1 } },
+                        { text: "Покладаюся на власний досвід", weights: { eng: 2, biz: 1 } },
+                        { text: "Раджуся з іншими", weights: { psych: 2, media: 1, edu: 1 } },
+                        { text: "Орієнтуюся на інтуїцію", weights: { art: 2, media: 1 } },
+                        { text: "Ретельно обдумую всі можливі варіанти", weights: { med: 2, law: 1, econ: 1 } }
+                    ]
+                }
+            ]
+        },
+        {
+            partTitle: "Частина 2. Професійні навички",
+            questions: [
+                {
+                    id: 6,
+                    q: "6. Наскільки добре ти вмієш працювати з інформацією та документами?",
+                    type: "radio",
+                    options: [
+                        { text: "Дуже добре", weights: { law: 3, econ: 2, edu: 1 } },
+                        { text: "Добре", weights: { law: 1, biz: 1, media: 1 } },
+                        { text: "На базовому рівні", weights: {} },
+                        { text: "Майже не маю досвіду", weights: {} }
+                    ]
+                },
+                {
+                    id: 7,
+                    q: "7. Чи вмієш ти працювати з фінансами, розрахунками та числами?",
+                    type: "radio",
+                    options: [
+                        { text: "Так, добре справляюся", weights: { econ: 3, biz: 2, it: 1 } },
+                        { text: "Маю базові навички", weights: { econ: 1, eng: 1 } },
+                        { text: "Іноді виникають труднощі", weights: {} },
+                        { text: "Не дуже люблю такі завдання", weights: { art: 1, media: 1 } }
+                    ]
+                },
+                {
+                    id: 8,
+                    q: "8. Наскільки легко тобі знаходити спільну мову з незнайомими людьми?",
+                    type: "radio",
+                    options: [
+                        { text: "Дуже легко", weights: { media: 2, biz: 2, psych: 2, edu: 1 } },
+                        { text: "Переважно легко", weights: { med: 1, law: 1 } },
+                        { text: "Залежить від ситуації", weights: {} },
+                        { text: "Мені складно спілкуватися з незнайомцями", weights: { it: 1, eng: 1 } }
+                    ]
+                },
+                {
+                    id: 9,
+                    q: "9. Чи подобається тобі пояснювати іншим складну інформацію?",
+                    type: "radio",
+                    options: [
+                        { text: "Так, мені це подобається", weights: { edu: 3, psych: 1, law: 1 } },
+                        { text: "Іноді, якщо добре розумію тему", weights: { it: 1, med: 1 } },
+                        { text: "Не дуже", weights: {} },
+                        { text: "Ні, не люблю навчати інших", weights: {} }
+                    ]
+                },
+                {
+                    id: 10,
+                    q: "10. Наскільки добре ти вмієш організовувати власний час?",
+                    type: "scale",
+                    minLabel: "1 — Важко планувати час",
+                    maxLabel: "5 — Завжди дотримуюся плану",
+                    weightsByValue: {
+                        1: {},
+                        2: {},
+                        3: { edu: 1 },
+                        4: { biz: 1, econ: 1, med: 1 },
+                        5: { biz: 2, law: 2, econ: 1 }
+                    }
+                },
+                {
+                    id: 11,
+                    q: "11. Чи маєш ти досвід роботи з інструментами, обладнанням або технікою?",
+                    type: "radio",
+                    options: [
+                        { text: "Так, маю хороший досвід", weights: { eng: 3, med: 1, it: 1 } },
+                        { text: "Маю невеликий досвід", weights: { eng: 2 } },
+                        { text: "Тільки в навчальних цілях", weights: { eng: 1 } },
+                        { text: "Не маю такого досвіду, але хотів би спробувати", weights: {} }
+                    ]
+                },
+                {
+                    id: 12,
+                    q: "12. Як ти ставишся до роботи, яка вимагає уважності та точності?",
+                    type: "radio",
+                    options: [
+                        { text: "Мені подобається така робота", weights: { med: 2, law: 2, econ: 2, it: 1 } },
+                        { text: "Можу виконувати її без проблем", weights: { eng: 1 } },
+                        { text: "Швидко втомлююся від неї", weights: { art: 1, media: 1 } },
+                        { text: "Не люблю такі завдання", weights: { art: 1 } }
+                    ]
+                }
+            ]
+        },
+        {
+            partTitle: "Частина 3. Ситуаційні запитання",
+            questions: [
+                {
+                    id: 13,
+                    q: "13. Якщо людина звернулася до тебе по допомогу, як ти вчиниш?",
+                    type: "radio",
+                    options: [
+                        { text: "Постараюся допомогти та знайти рішення", weights: { med: 2, it: 1, eng: 1 } },
+                        { text: "Вислухаю її та дам пораду", weights: { psych: 3, edu: 1 } },
+                        { text: "Спробую знайти спеціаліста, який допоможе", weights: { biz: 2, law: 1 } },
+                        { text: "Залежить від ситуації", weights: {} }
+                    ]
+                },
+                {
+                    id: 14,
+                    q: "14. Якщо ти отримав складне завдання з коротким терміном виконання, що зробиш?",
+                    type: "radio",
+                    options: [
+                        { text: "Складу план і розподілю час", weights: { biz: 2, econ: 2 } },
+                        { text: "Одразу почну виконувати завдання", weights: { eng: 2, med: 1 } },
+                        { text: "Попрошу допомоги в інших", weights: { media: 1, psych: 1 } },
+                        { text: "Спочатку спробую розібратися в усіх деталях", weights: { it: 2, law: 2 } }
+                    ]
+                },
+                {
+                    id: 15,
+                    q: "15. Тобі доручили організувати захід. Що тобі було б найцікавіше робити?",
+                    type: "radio",
+                    options: [
+                        { text: "Планувати бюджет та витрати", weights: { econ: 3, biz: 1 } },
+                        { text: "Спілкуватися з учасниками та гостями", weights: { media: 3, psych: 1 } },
+                        { text: "Розробляти оформлення та концепцію", weights: { art: 3, media: 1 } },
+                        { text: "Керувати командою та контролювати процес", weights: { biz: 3, law: 1 } }
+                    ]
+                },
+                {
+                    id: 16,
+                    q: "16. Яке завдання ти обрав би для навчального проєкту?",
+                    type: "radio",
+                    options: [
+                        { text: "Дослідити проблему та провести експеримент", weights: { med: 3, it: 1 } },
+                        { text: "Розробити бізнес-план", weights: { biz: 2, econ: 2 } },
+                        { text: "Створити дизайн або рекламну кампанію", weights: { art: 2, media: 2 } },
+                        { text: "Підготувати правовий аналіз певної ситуації", weights: { law: 3 } },
+                        { text: "Розробити технічну конструкцію", weights: { eng: 3, it: 1 } },
+                        { text: "Створити навчальний матеріал для інших", weights: { edu: 3 } }
+                    ]
+                },
+                {
+                    id: 17,
+                    q: "17. Як ти реагуєш на критику своєї роботи?",
+                    type: "radio",
+                    options: [
+                        { text: "Аналізую зауваження та виправляю помилки", weights: { it: 2, eng: 1, law: 1 } },
+                        { text: "Спокійно сприймаю та враховую думку", weights: { psych: 2, edu: 1, biz: 1 } },
+                        { text: "Можу засмутитися, але працюю над помилками", weights: { art: 1, media: 1 } },
+                        { text: "Мені складно сприймати критику", weights: {} }
+                    ]
+                }
+            ]
+        },
+        {
+            partTitle: "Частина 4. Вибір майбутньої професії",
+            questions: [
+                {
+                    id: 18,
+                    q: "18. У якому робочому середовищі ти хотів би працювати?",
+                    type: "radio",
+                    options: [
+                        { text: "Офіс або бізнес-центр", weights: { econ: 2, biz: 2, law: 2 } },
+                        { text: "Лікарня або медичний заклад", weights: { med: 4 } },
+                        { text: "Лабораторія або дослідницький центр", weights: { med: 2, eng: 2 } },
+                        { text: "Школа або навчальний заклад", weights: { edu: 4 } },
+                        { text: "Будівельний майданчик або виробництво", weights: { eng: 4 } },
+                        { text: "Творча студія", weights: { art: 4, media: 1 } },
+                        { text: "Віддалена робота з дому", weights: { it: 3, art: 1, media: 1 } },
+                        { text: "На відкритому повітрі або в подорожах", weights: { media: 2, biz: 1 } }
+                    ]
+                },
+                {
+                    id: 19,
+                    q: "19. Який напрям навчання тобі найбільше до вподоби?",
+                    type: "radio",
+                    options: [
+                        { text: "Математика та фізика", weights: { eng: 3, it: 2, econ: 1 } },
+                        { text: "Біологія та хімія", weights: { med: 4 } },
+                        { text: "Історія та правознавство", weights: { law: 4, edu: 1 } },
+                        { text: "Мови та література", weights: { media: 3, edu: 2 } },
+                        { text: "Інформатика та технології", weights: { it: 4 } },
+                        { text: "Мистецтво та дизайн", weights: { art: 4 } },
+                        { text: "Економіка та підприємництво", weights: { econ: 3, biz: 3 } },
+                        { text: "Психологія та суспільствознавство", weights: { psych: 4, edu: 1 } }
+                    ]
+                },
+                {
+                    id: 20,
+                    q: "20. Яка професія тобі здається найбільш цікавою?",
+                    type: "radio",
+                    options: [
+                        { text: "Лікар або фармацевт", weights: { med: 4 } },
+                        { text: "Юрист або адвокат", weights: { law: 4 } },
+                        { text: "Економіст або бухгалтер", weights: { econ: 4 } },
+                        { text: "Інженер або архітектор", weights: { eng: 4 } },
+                        { text: "Програміст або тестувальник", weights: { it: 4 } },
+                        { text: "Дизайнер або художник", weights: { art: 4 } },
+                        { text: "Учитель або викладач", weights: { edu: 4 } },
+                        { text: "Психолог", weights: { psych: 4 } },
+                        { text: "Маркетолог або журналіст", weights: { media: 4 } },
+                        { text: "Підприємець або менеджер", weights: { biz: 4 } },
+                        { text: "Кухар або готельний менеджер", weights: { biz: 2, art: 1 } },
+                        { text: "Еколог або біолог", weights: { med: 2, eng: 1 } }
+                    ]
+                },
+                {
+                    id: 21,
+                    q: "21. Що для тебе найважливіше в майбутній професії?",
+                    type: "checkbox",
+                    options: [
+                        { text: "Висока заробітна плата", weights: { it: 1, biz: 1, econ: 1, law: 1 } },
+                        { text: "Стабільність роботи", weights: { med: 1, edu: 1, econ: 1 } },
+                        { text: "Можливість кар'єрного зростання", weights: { biz: 2, law: 1 } },
+                        { text: "Допомога іншим людям", weights: { med: 2, psych: 2, edu: 1 } },
+                        { text: "Творча самореалізація", weights: { art: 2, media: 2 } },
+                        { text: "Можливість працювати за кордоном", weights: { it: 2, eng: 1 } },
+                        { text: "Гнучкий графік", weights: { it: 1, art: 1, media: 1 } },
+                        { text: "Цікаві та різноманітні завдання", weights: { media: 1, biz: 1, eng: 1 } }
+                    ]
+                },
+                {
+                    id: 22,
+                    q: "22. Який формат роботи тобі найбільше підходить?",
+                    type: "radio",
+                    options: [
+                        { text: "Самостійна робота", weights: { it: 2, art: 2, econ: 1 } },
+                        { text: "Робота в команді", weights: { eng: 2, media: 1, med: 1 } },
+                        { text: "Керування іншими людьми", weights: { biz: 3, law: 1 } },
+                        { text: "Робота з клієнтами", weights: { psych: 2, media: 2, law: 1 } },
+                        { text: "Поєднання різних форматів", weights: { edu: 1, biz: 1 } }
+                    ]
+                }
+            ]
+        },
+        {
+            partTitle: "Частина 5. Готовність до працевлаштування",
+            questions: [
+                {
+                    id: 23,
+                    q: "23. Чи маєш ти досвід роботи або волонтерства?",
+                    type: "radio",
+                    isMeta: true,
+                    options: [
+                        { text: "Так, маю офіційний досвід роботи", metaVal: "У тебе вже є офіційний досвід — можна сміливо подаватися на позиції Junior / Specialist." },
+                        { text: "Маю досвід неофіційної роботи", metaVal: "Неофіційний досвід — це вже плюс у резюме. Оформи його як кейси або фріланс-проєкти." },
+                        { text: "Брав участь у волонтерських проєктах", metaVal: "Волонтерство чудово підтверджує твої soft skills для першого роботодавця." },
+                        { text: "Маю досвід навчальних або особистих проєктів", metaVal: "Навчальні проєкти варто оформити в портфоліо — цього достатньо для старту стажування." },
+                        { text: "Не маю жодного досвіду", metaVal: "Найкращий старт без досвіду — стажування (Internship) або позиції Trainee на Student Hub." }
+                    ]
+                },
+                {
+                    id: 24,
+                    q: "24. Які навички ти хотів би розвинути для майбутньої роботи?",
+                    type: "checkbox",
+                    isMeta: true,
+                    options: [
+                        { text: "Іноземні мови", skillTag: "Іноземні мови" },
+                        { text: "Комп'ютерна грамотність", skillTag: "Комп'ютерна грамотність" },
+                        { text: "Комунікація та переговори", skillTag: "Комунікація та переговори" },
+                        { text: "Фінансова грамотність", skillTag: "Фінансова грамотність" },
+                        { text: "Лідерство та управління", skillTag: "Лідерство та управління" },
+                        { text: "Творчі навички", skillTag: "Творчі навички" },
+                        { text: "Професійні технічні навички", skillTag: "Професійні технічні навички" },
+                        { text: "Робота з документами", skillTag: "Робота з документами" }
+                    ]
+                },
+                {
+                    id: 25,
+                    q: "25. Наскільки ти готовий до пошуку першої роботи?",
+                    type: "radio",
+                    isMeta: true,
+                    options: [
+                        { text: "Уже активно шукаю роботу", readinessStatus: "Висока готовність: ти в активному пошуку — час відгукуватися на вакансії!" },
+                        { text: "Готовий почати шукати найближчим часом", readinessStatus: "Висока готовність: підготуй резюме та починай моніторити пропозиції." },
+                        { text: "Спочатку хочу пройти навчання або курси", readinessStatus: "Середня готовність: спершу підтягни профільні курси, а потім переходь до стажувань." },
+                        { text: "Поки що хочу визначитися з професією", readinessStatus: "Етап вибору: ти щойно зробив перший крок, обравши свій напрям!" },
+                        { text: "Ще не планую працювати", readinessStatus: "Етап навчання: зосередься на теорії та пет-проєктах під час навчання." }
+                    ]
+                }
+            ]
+        }
+    ];
+
+    const profiles = {
+        it: {
+            specialty: "121 Інженерія програмного забезпечення / 122 Комп'ютерні науки / 125 Кібербезпека",
+            profession: "Junior Developer, QA Engineer (Тестувальник), Data Analyst, SysAdmin",
+            desc: "Твій профіль вказує на сильне логічне мислення, інтерес до технологій та вміння аналізувати деталі. Тобі підійде розробка ПЗ, тестування або аналітика даних."
+        },
+        med: {
+            specialty: "222 Медицина / 226 Фармація / 227 Терапія та реабілітація",
+            profession: "Лікар-інтерн, Фармацевт, Лаборант медичних досліджень, Реабілітолог",
+            desc: "Висока відповідальність, уважність та щире бажання допомагати людям роблять тебе сильним кандидатом для сфери охорони здоров'я та біомедичних досліджень."
+        },
+        econ: {
+            specialty: "051 Економіка / 071 Облік і оподаткування / 072 Фінанси, банківська справа",
+            profession: "Фінансовий аналітик, Бухгалтер, Економіст, Аудитор",
+            desc: "Тобі легко даються розрахунки, робота з цифрами, документами та планування ресурсів. Бізнес завжди цінує фахівців, які вміють рахувати гроші та ризики."
+        },
+        law: {
+            specialty: "081 Право / 293 Міжнародне право",
+            profession: "Помічник юриста (Paralegal), Юрисконсульт, Адвокат, Фахівець з комплаєнсу",
+            desc: "Аналітичний підхід до фактів, уважність до деталей та вміння працювати з документацією — ідеальна база для побудови кар'єри в юриспруденції."
+        },
+        eng: {
+            specialty: "131 Прикладна механіка / 192 Будівництво та цивільна інженерія / 141 Електроенергетика",
+            profession: "Інженер-проєктувальник, Інженер-конструктор, Архітектор, Технічний спеціаліст",
+            desc: "Тобі подобається бачити реальний, відчутний результат праці та розуміти, як влаштовані складні механізми й конструкції."
+        },
+        art: {
+            specialty: "022 Дизайн / 023 Образотворче мистецтво / 021 Аудіовізуальне мистецтво",
+            profession: "UI/UX Designer, Графічний дизайнер, Ілюстратор, Motion-дизайнер",
+            desc: "Твоя головна перевага — креативність та візуальне мислення. Тобі потрібне середовище, де можна створювати нестандартні та естетичні продукти."
+        },
+        edu: {
+            specialty: "014 Середня освіта / 011 Освітні, педагогічні науки",
+            profession: "Викладач, Репетитор, Методист освітніх програм, Корпоративний тренер",
+            desc: "Терплячість, уміння просто пояснювати складні речі та бажання ділитися знаннями роблять тебе чудовим наставником і педагогом."
+        },
+        biz: {
+            specialty: "073 Менеджмент / 076 Підприємництво та торгівля / 242 Туризм",
+            profession: "Junior Project Manager, Бізнес-аналітик, Адміністратор, Підприємець",
+            desc: "Ти вмієш організовувати процеси, брати на себе відповідальність і вести людей до спільної мети. Твій шлях — управління проєктами або власна справа."
+        },
+        psych: {
+            specialty: "053 Психологія / 231 Соціальна робота",
+            profession: "Психолог-консультант, HR-менеджер, Рекрутер, Фахівець із соціальної роботи",
+            desc: "Висока емпатія, вміння слухати та розуміти мотиви людей дозволять тобі успішно працювати як у психологічній практиці, так і в HR-сфері."
+        },
+        media: {
+            specialty: "061 Журналістика / 075 Маркетинг / 291 Міжнародні комунікації",
+            profession: "SMM-спеціаліст, PR-менеджер, Копірайтер, Маркетолог, Журналіст",
+            desc: "Комунікабельність, легкість у спілкуванні та генерація ідей — ключові навички для сучасного ринку медіа, реклами та просування брендів."
+        }
+    };
+
+    let currentPart = 0;
+    const partsContainer = document.getElementById("parts-container");
+
+    function renderAllParts() {
+        partsContainer.innerHTML = "";
+
+        quizParts.forEach((part, pIndex) => {
+            const section = document.createElement("div");
+            section.className = `part-section ${pIndex === 0 ? "active" : ""}`;
+            section.id = `part-${pIndex}`;
+
+            let html = `<div class="part-banner">${part.partTitle}</div>`;
+
+            part.questions.forEach((item) => {
+                let hintText = "Один варіант";
+                if (item.type === "checkbox") hintText = "Можна кілька";
+                if (item.type === "scale") hintText = "Шкала 1–5";
+
+                html += `
+                    <div class="question-card" id="q-card-${item.id}">
+                        <div class="question-header">
+                            <div class="question-title">${item.q}</div>
+                            <span class="type-hint">${hintText}</span>
+                        </div>
+                `;
+
+                if (item.type === "radio" || item.type === "checkbox") {
+                    html += `<div class="options-group">`;
+                    item.options.forEach((opt, oIndex) => {
+                        html += `
+                            <label class="option-label">
+                                <input type="${item.type}" name="q_${item.id}" value="${oIndex}" onchange="clearCardError(${item.id})">
+                                <span>${opt.text}</span>
+                            </label>
+                        `;
+                    });
+                    html += `</div>`;
+                } else if (item.type === "scale") {
+                    html += `
+                        <div class="scale-container">
+                            <div class="scale-buttons">
+                                ${[1, 2, 3, 4, 5].map(num => `
+                                    <label class="scale-item">
+                                        <input type="radio" name="q_${item.id}" value="${num}" onchange="clearCardError(${item.id})">
+                                        <div class="scale-box">${num}</div>
+                                    </label>
+                                `).join("")}
+                            </div>
+                            <div class="scale-labels">
+                                <span>${item.minLabel}</span>
+                                <span>${item.maxLabel}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                html += `</div>`;
+            });
+
+            // Кнопки навігації
+            html += `<div class="nav-buttons">`;
+            if (pIndex > 0) {
+                html += `<button type="button" class="btn btn-secondary" onclick="prevPart()">← Назад</button>`;
+            }
+            if (pIndex < quizParts.length - 1) {
+                html += `<button type="button" class="btn btn-primary" onclick="nextPart()">Далі →</button>`;
+            } else {
+                html += `<button type="button" class="btn btn-primary" onclick="finishQuiz()">Отримати результат</button>`;
+            }
+            html += `</div>`;
+
+            section.innerHTML = html;
+            partsContainer.appendChild(section);
+        });
+    }
+
+    function clearCardError(qId) {
+        document.getElementById(`q-card-${qId}`).classList.remove("unanswered");
+        document.getElementById("error-msg").style.display = "none";
+    }
+
+    function validateCurrentPart() {
+        const part = quizParts[currentPart];
+        let isValid = true;
+        let firstInvalid = null;
+
+        part.questions.forEach((item) => {
+            const checked = document.querySelectorAll(`input[name="q_${item.id}"]:checked`);
+            const card = document.getElementById(`q-card-${item.id}`);
+            if (checked.length === 0) {
+                isValid = false;
+                card.classList.add("unanswered");
+                if (!firstInvalid) firstInvalid = card;
+            } else {
+                card.classList.remove("unanswered");
+            }
+        });
+
+        if (!isValid) {
+            document.getElementById("error-msg").style.display = "block";
+            firstInvalid.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+        return isValid;
+    }
+
+    function updateProgress() {
+        const percent = ((currentPart + 1) / quizParts.length) * 100;
+        document.getElementById("part-indicator").innerText = `Частина ${currentPart + 1} з ${quizParts.length}`;
+        document.getElementById("percent-indicator").innerText = `${percent}%`;
+        document.getElementById("progress-fill").style.width = `${percent}%`;
+    }
+
+    function nextPart() {
+        if (!validateCurrentPart()) return;
+        document.getElementById(`part-${currentPart}`).classList.remove("active");
+        currentPart++;
+        document.getElementById(`part-${currentPart}`).classList.add("active");
+        updateProgress();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function prevPart() {
+        document.getElementById("error-msg").style.display = "none";
+        document.getElementById(`part-${currentPart}`).classList.remove("active");
+        currentPart--;
+        document.getElementById(`part-${currentPart}`).classList.add("active");
+        updateProgress();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function finishQuiz() {
+        if (!validateCurrentPart()) return;
+
+        const scores = {
+            it: 0, med: 0, econ: 0, law: 0, eng: 0,
+            art: 0, edu: 0, biz: 0, psych: 0, media: 0
+        };
+
+        let expText = "";
+        let readinessText = "";
+        const selectedSkills = [];
+
+        quizParts.forEach((part) => {
+            part.questions.forEach((item) => {
+                const checkedInputs = document.querySelectorAll(`input[name="q_${item.id}"]:checked`);
+
+                if (item.type === "scale") {
+                    const val = parseInt(checkedInputs[0].value, 10);
+                    const weights = item.weightsByValue[val] || {};
+                    for (const [k, v] of Object.entries(weights)) {
+                        scores[k] += v;
+                    }
+                } else {
+                    checkedInputs.forEach((input) => {
+                        const optIndex = parseInt(input.value, 10);
+                        const optionObj = item.options[optIndex];
+
+                        if (optionObj.weights) {
+                            for (const [k, v] of Object.entries(optionObj.weights)) {
+                                scores[k] += v;
+                            }
+                        }
+                        if (optionObj.metaVal) expText = optionObj.metaVal;
+                        if (optionObj.readinessStatus) readinessText = optionObj.readinessStatus;
+                        if (optionObj.skillTag) selectedSkills.push(optionObj.skillTag);
+                    });
+                }
+            });
+        });
+
+        // Визначення профілю-переможця
+        const bestKey = Object.keys(scores).reduce((a, b) => scores[a] >= scores[b] ? a : b);
+        const profile = profiles[bestKey];
+
+        document.getElementById("res-specialty").innerText = profile.specialty;
+        document.getElementById("res-profession").innerText = profile.profession;
+        document.getElementById("res-desc").innerText = profile.desc;
+        document.getElementById("res-readiness").innerText = `${readinessText} ${expText}`;
+
+        const skillsWrapper = document.getElementById("res-skills-wrapper");
+        const skillsList = document.getElementById("res-skills-list");
+        if (selectedSkills.length > 0) {
+            skillsWrapper.style.display = "block";
+            skillsList.innerHTML = selectedSkills.map(s => `<span class="skill-tag">${s}</span>`).join("");
+        } else {
+            skillsWrapper.style.display = "none";
+        }
+
+        document.getElementById("quiz-form").style.display = "none";
+        document.getElementById("header-card").style.display = "none";
+        const resultBlock = document.getElementById("result-block");
+        resultBlock.style.display = "block";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function resetQuiz() {
+        document.getElementById("quiz-form").reset();
+        document.getElementById("result-block").style.display = "none";
+        document.getElementById("quiz-form").style.display = "block";
+        document.getElementById("header-card").style.display = "block";
+        document.querySelectorAll(".question-card").forEach(c => c.classList.remove("unanswered"));
+
+        document.getElementById(`part-${currentPart}`).classList.remove("active");
+        currentPart = 0;
+        document.getElementById("part-0").classList.add("active");
+        updateProgress();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    renderAllParts();
+</script>
+
+</body>
+</html>
